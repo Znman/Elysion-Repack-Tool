@@ -9,7 +9,6 @@
 namespace fs = std::filesystem;
 
 char header[16] = "Pandora.box";
-std::string filepath = "GRPH.PBX";  // the PBX file name
 
 struct index {
     char name[12];
@@ -18,6 +17,8 @@ struct index {
 };
 
 std::vector<index> fileindex;
+
+void writingindex(std::fstream&, const std::string, int);
 
 void modifyFile(const std::string& filename, uint32_t newData) {
     std::fstream file(filename,
@@ -77,34 +78,43 @@ int BuildingIndex(std::string filepath) {
         if (entry.is_directory()) {
             continue;
         } else if (entry.is_regular_file()) {
-            if (extensionStr == ".bmp") {
-                std::uintmax_t fileSize =
-                    std::filesystem::file_size(filenameStr);
-                fileindex.push_back(index());
-                fileSize = static_cast<uint32_t>(fileSize);
-                fileindex[i].size = fileSize;
-                fileindex[i].shift = 0;
-                // writing index to the newfile
-                std::strncpy(fileindex[i].name, filenameStr.c_str(),
-                             sizeof(fileindex[i].name));
-                // fileindex[i].name[sizeof(fileindex[i].name) - 1] = '\0';
-                std::cout << reinterpret_cast<char*>(fileindex[i].name)
-                          << std::endl;
-                outfile.write(reinterpret_cast<char*>(fileindex[i].name),
-                              sizeof(fileindex[i].name));
-                outfile.write(reinterpret_cast<char*>(&fileindex[i].size),
-                              sizeof(fileindex[i].size));
+            if ((extensionStr == ".bmp" || extensionStr == ".BMP") &&
+                ((filepath == "DATA.PBX") || (filepath == "GRPH.PBX"))) {
+                writingindex(outfile, filenameStr, i);
                 i++;
-            } else
-                ;  // not .bmp
-        } else
-            ;  // not dir nor file
+            } else if ((extensionStr == ".wav" || extensionStr == ".WAV") &&
+                       ((filepath == "WAVE.PBX") || (filepath == "WAVS.PBX"))) {
+                writingindex(outfile, filenameStr, i);
+                i++;
+            } else if ((extensionStr == "tip" || extensionStr == "map" ||
+                        extensionStr == "mds") &&
+                       filepath == "DATA.PBX") {
+                writingindex(outfile, filenameStr, i);
+                i++;
+            }
+        }
     }
     outfile.close();
     return 0;
 }
 
-void writingfiles() {
+void writingindex(std::fstream& outfile, const std::string filenameStr, int i) {
+    std::uintmax_t fileSize = std::filesystem::file_size(filenameStr);
+    fileindex.push_back(index());
+    fileSize = static_cast<uint32_t>(fileSize);
+    fileindex[i].size = fileSize;
+    fileindex[i].shift = 0;
+    // writing index to the newfile
+    std::strncpy(fileindex[i].name, filenameStr.c_str(),
+                 sizeof(fileindex[i].name));
+    // fileindex[i].name[sizeof(fileindex[i].name) - 1] = '\0';
+    std::cout << reinterpret_cast<char*>(fileindex[i].name) << std::endl;
+    outfile.write(reinterpret_cast<char*>(fileindex[i].name),
+                  sizeof(fileindex[i].name));
+    outfile.write(reinterpret_cast<char*>(&fileindex[i].size),
+                  sizeof(fileindex[i].size));
+}
+void writingfiles(std::string filepath) {
     std::fstream outfile(filepath,
                          std::ios::binary | std::ios::out | std::ios::app);
     for (int i = 0; i < fileindex.size(); i++) {
@@ -121,9 +131,30 @@ void writingfiles() {
 }
 
 int main() {
+    std::string filepath = "GRPH.PBX";  // the PBX file name
+    int tmp = 0;
+    std::cout << "1.data 2.grph 3.wave 4.wavs" << std::endl;
+    std::cin >> tmp;
+    switch (tmp) {
+    case 1:
+        filepath = "DATA.PBX";
+        break;
+    case 2:
+        filepath = "GRPH.PBX";
+        break;
+    case 3:
+        filepath = "WAVE.PBX";
+        break;
+    case 4:
+        filepath = "WAVS.PBX";
+        break;
+    default:
+        std::cout << "wrong input!";
+        return 0;
+    }
     BuildingIndex(filepath);
     std::uintmax_t fileSize = std::filesystem::file_size(filepath);
     modifyFile(filepath, static_cast<uint32_t>(fileSize));
-    writingfiles();
+    writingfiles(filepath);
     return 0;
 }
