@@ -86,9 +86,9 @@ int BuildingIndex(std::string filepath) {
                        ((filepath == "WAVE.PBX") || (filepath == "WAVS.PBX"))) {
                 writingindex(outfile, filenameStr, i);
                 i++;
-            } else if ((extensionStr == "tip" || extensionStr == "map" ||
-                        extensionStr == "mds") &&
-                       filepath == "DATA.PBX") {
+            } else if ((extensionStr == ".tip" || extensionStr == ".map" ||
+                        extensionStr == ".mds") &&
+                       (filepath == "DATA.PBX")) {
                 writingindex(outfile, filenameStr, i);
                 i++;
             }
