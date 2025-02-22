@@ -75,6 +75,12 @@ int BuildingIndex(std::string filepath) {
     for (const auto& entry : fs::directory_iterator(currentDir)) {
         const auto filenameStr = entry.path().filename().string();
         const auto extensionStr = entry.path().extension().string();
+        if (filenameStr.length() > 8) {
+            std::cout << "file " << filenameStr
+                      << " too long , it shouldn't be longer than 8 character."
+                      << std::endl;
+            continue;
+        }
         if (entry.is_directory()) {
             continue;
         } else if (entry.is_regular_file()) {
@@ -127,6 +133,8 @@ void writingfiles(std::string filepath) {
                   << filepath << std::endl;
         inputFile.close();
     }
+    std::cout << "Finished packing the resources." << std::endl
+              << "press anykey to end the program.";
     outfile.close();
 }
 
@@ -156,5 +164,9 @@ int main() {
     std::uintmax_t fileSize = std::filesystem::file_size(filepath);
     modifyFile(filepath, static_cast<uint32_t>(fileSize));
     writingfiles(filepath);
+    // clear buffer, wait for input to close program
+    std::cin.clear();
+    std::cin.ignore(INT_MAX, '\n');
+    std::cin.get();
     return 0;
 }
