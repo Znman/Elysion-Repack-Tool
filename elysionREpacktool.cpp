@@ -84,7 +84,12 @@ int BuildingIndex(std::string filepath) {
                 i++;
             } else if ((extensionStr == ".wav" || extensionStr == ".WAV") &&
                        ((filepath == "WAVE.PBX") || (filepath == "WAVS.PBX"))) {
-                writingindex(outfile, filenameStr, i);
+                if (filenameStr.length() > 12) {
+                    std::cout << "file " << filenameStr
+                              << " is longer than 8 characters." << std::endl;
+                    continue;
+                } else
+                    writingindex(outfile, filenameStr, i);
                 i++;
             } else if ((extensionStr == ".tip" || extensionStr == ".map" ||
                         extensionStr == ".mds") &&
