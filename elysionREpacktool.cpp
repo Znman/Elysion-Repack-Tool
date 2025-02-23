@@ -75,12 +75,6 @@ int BuildingIndex(std::string filepath) {
     for (const auto& entry : fs::directory_iterator(currentDir)) {
         const auto filenameStr = entry.path().filename().string();
         const auto extensionStr = entry.path().extension().string();
-        if (filenameStr.length() > 8) {
-            std::cout << "file " << filenameStr
-                      << " too long , it shouldn't be longer than 8 character."
-                      << std::endl;
-            continue;
-        }
         if (entry.is_directory()) {
             continue;
         } else if (entry.is_regular_file()) {
